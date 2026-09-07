@@ -134,7 +134,7 @@ const fechAiResponse = (userMsg) => {
     message: userMsg,
   },
   (chunk)=>{
-      fullResponse += chunk
+      fullResponse.value += chunk
       //AI正在回复的消息
          const lastMsg = messages.value[messages.value.length - 1]
        if (lastMsg && lastMsg.role === 'ai') {
