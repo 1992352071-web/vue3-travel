@@ -18,6 +18,7 @@
       <van-tag class="quick-tag"
        mark type="primary" 
        v-for="question in commonQuestions" :key="question"
+       @click="inputMessage = question"
        
        >{{ question }}</van-tag>
     </div>
