@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { isLoggedIn } from '../utils/auth'
+import { showToast } from 'vant'
+import { pinia } from '../stores'
+import { useUserStore } from '../stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,17 +15,19 @@ const router = createRouter({
       path: '/chat',
       name: 'chat',
       component: () => import('../views/Chat.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/profile',
       name: 'profile',
       component: () => import('../views/Profile.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/detail',
       name: 'detail',
       component: () => import('../views/Detail.vue'),
-
+      meta: { requiresAuth: true },
     },
     {
       path: '/login',
@@ -34,9 +38,11 @@ const router = createRouter({
   ],
 })
 
-// 未登录访问个人中心时跳转登录页，登录成功后回跳
+// 未登录访问需要登录的页面时：提示并跳转登录页，登录成功后回跳
 router.beforeEach((to) => {
-  if (to.name === 'profile' && !isLoggedIn()) {
+  const userStore = useUserStore(pinia)
+  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
+    showToast('请先登录')
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 })

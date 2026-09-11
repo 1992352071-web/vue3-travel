@@ -6,7 +6,7 @@
     <div class="card user-card">
       <van-image round width="64" height="64" src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" />
       <div class="user-info">
-        <div class="user-name">旅行者</div>
+        <div class="user-name">{{ userStore.username || '旅行者' }}</div>
         <div class="user-desc">世界那么大，一起去看看</div>
       </div>
     </div>
@@ -50,9 +50,10 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
-import { logout } from '../utils/auth'
+import { useUserStore } from '../stores/user'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 // 旅行统计数据（示例数据）
 const stats = reactive({
@@ -81,7 +82,7 @@ const onLogout = () => {
     message: '确定要退出登录吗？'
   })
     .then(() => {
-      logout()
+      userStore.logout()
       showToast('已退出登录')
       router.replace('/login')
     })

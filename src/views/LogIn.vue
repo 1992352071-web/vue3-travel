@@ -109,10 +109,11 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import { isLoggedIn, login } from '../utils/auth'
+import { useUserStore } from '../stores/user'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const username = ref('')
 const password = ref('')
@@ -141,7 +142,7 @@ const onSubmit = async () => {
   submitting.value = true
   // 模拟登录请求耗时
   await new Promise((resolve) => setTimeout(resolve, 600))
-  login({ username: username.value })
+  userStore.login({ username: username.value })
   submitting.value = false
   logged.value = true
   showToast('登录成功')
@@ -166,7 +167,7 @@ const goBack = () => {
 
 onMounted(() => {
   // 已登录则直接进入个人中心
-  if (isLoggedIn()) {
+  if (userStore.isLoggedIn) {
     router.replace(redirectPath)
   }
 })

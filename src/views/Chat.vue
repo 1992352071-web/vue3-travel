@@ -57,17 +57,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onActivated, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchStream } from '../utils/request'
 import { showToast } from 'vant'
 import ChatBubble from './ChatBubble.vue'
+
+// 声明组件名，供 App.vue 的 KeepAlive include 匹配
+defineOptions({ name: 'Chat' })
 // 对话容器
 const chatContainer = ref(null)
 
 const scrollToBottom = () => {
   chatContainer.value.scrollTop = chatContainer.value.scrollHeight
 }
+
+// 切回本页时重新滚动到底部（KeepAlive 重新挂载 DOM 会重置滚动位置）
+onActivated(() => {
+  scrollToBottom()
+})
 
 
 

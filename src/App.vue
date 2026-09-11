@@ -1,6 +1,11 @@
 <template>
   <main class="app-content">
-    <RouterView />
+    <!-- KeepAlive 缓存首页和对话页：切换路由时组件不销毁，表单数据与 AI 回复状态保留 -->
+    <RouterView v-slot="{ Component }">
+      <KeepAlive include="Chat">
+        <component :is="Component" />
+      </KeepAlive>
+    </RouterView>
   </main>
   <!-- 登录页不显示底部导航 -->
   <van-tabbar v-if="route.path !== '/login'" v-model="active">

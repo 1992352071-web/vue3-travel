@@ -76,11 +76,14 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant';
+import { useUserStore } from '../stores/user'
+
 
 
 
 
 const router = useRouter()
+const userStore = useUserStore()
 // 表单数据
 const formData = reactive({
   "city":"",
@@ -110,8 +113,26 @@ const onConfirm = ({selectedOptions}) => {
 const onCancel = () => {
       showCityPicker.value = false
     };
+// 未登录校验：提示并跳转登录页，登录成功后回跳目标页面
+function requireLogin(redirect) {
+  if (userStore.isLoggedIn) {
+    return true
+  }
+  showToast('请先登录')
+  router.push({ path: '/login', query: { redirect } })
+  return false
+}
 // 提交表单事件
 const handerSumbmit = () => {
+  // 回跳目标带上已填表单，登录成功后直接进入对应行程页
+  const query = new URLSearchParams({
+    city: formData.city || '',
+    budget: formData.budget || '',
+    days: formData.days || '',
+  }).toString()
+  if (!requireLogin(`/detail?${query}`)) {
+    return
+  }
   console.log(formData)
   // 校验表单数据
   if(!formData.city){
@@ -142,6 +163,9 @@ const handerSumbmit = () => {
 }
 // 快捷入口跳转函数
 function goPage(path) {
+  if (!requireLogin(path)) {
+    return
+  }
   router.push(path)
 }
 // 选择城市方法

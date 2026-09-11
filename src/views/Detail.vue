@@ -85,6 +85,7 @@ const errorMessage = ref('')
 //返回的推荐数据
 const tripData = ref(null)
 
+
 // 接收表单提交数据
 const formData = reactive({
   city: '北京',
