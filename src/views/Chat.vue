@@ -127,6 +127,7 @@ timestamp: new Date().toISOString()
 const fechAiResponse = (userMsg) => {
   console.log(`要获取流式响应了${userMsg}`)
   isStreaming.value = true
+  fullResponse.value = ''
   //添加ai返回的消息
   // 固定格式ai对象数据增加
         messages.value.push({
@@ -143,10 +144,11 @@ const fechAiResponse = (userMsg) => {
    //分片处理函数
   (chunk)=>{
       fullResponse.value += chunk
-      //AI正在回复的消息
+      //AI正在回复的消息：注意取 .value，赋字符串原始值而非 ref 对象本身，
+      //否则所有 AI 气泡会共享同一个 ref，新一轮重置会把历史内容一起清空
          const lastMsg = messages.value[messages.value.length - 1]
        if (lastMsg && lastMsg.role === 'ai') {
-          lastMsg.content = fullResponse}
+          lastMsg.content = fullResponse.value}
          
           scrollToBottom()
   },
