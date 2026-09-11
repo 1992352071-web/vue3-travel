@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { isLoggedIn } from '../utils/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,8 +25,20 @@ const router = createRouter({
       component: () => import('../views/Detail.vue'),
 
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LogIn.vue'),
+    },
 
   ],
+})
+
+// 未登录访问个人中心时跳转登录页，登录成功后回跳
+router.beforeEach((to) => {
+  if (to.name === 'profile' && !isLoggedIn()) {
+    return { path: '/login', query: { redirect: to.fullPath } }
+  }
 })
 
 export default router

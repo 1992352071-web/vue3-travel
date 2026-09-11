@@ -48,7 +48,11 @@
 
 <script setup>
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
+import { logout } from '../utils/auth'
+
+const router = useRouter()
 
 // 旅行统计数据（示例数据）
 const stats = reactive({
@@ -77,7 +81,9 @@ const onLogout = () => {
     message: '确定要退出登录吗？'
   })
     .then(() => {
+      logout()
       showToast('已退出登录')
+      router.replace('/login')
     })
     .catch(() => {})
 }
