@@ -17,7 +17,7 @@ request.interceptors.response.use(
   (response) => response.data,
   (error) => Promise.reject(error),
 )
-// 流式接口处理
+// ai流式接口处理
 export async function fetchStream(url, data, onChunk, onComplete, onError) {
   //终止请求控制器
   // 备用接口
@@ -43,6 +43,8 @@ export async function fetchStream(url, data, onChunk, onComplete, onError) {
 
   while (true) {
     const { done, value } = await reader.read()
+    console.log(`已经流式读取到数据`)
+
     //读取完毕标识符
     if (done) {
       break
@@ -51,15 +53,18 @@ export async function fetchStream(url, data, onChunk, onComplete, onError) {
     console.log(chunk)
 
     const lines = chunk.split('\n').filter(line => line.trim())
+    console.log(lines)
     for (const line of lines) {
       if (line.startsWith('data:')) {
-        const jsonStr = Line.substring(5)
+        const jsonStr = line.substring(5)
         try {
           if (jsonStr) {
             const jsonData = JSON.parse(jsonStr)
 
             if (jsonData.type === 'chunk') {
-              //分片数据
+
+
+              //分片数据处理
               onChunk(jsonData.content)
             }
             else if (jsonData.done === 'true') {

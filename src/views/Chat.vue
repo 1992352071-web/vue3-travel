@@ -11,7 +11,7 @@
  </div>
  <div class="chat-container" ref="chatContainer">
   <!-- 对话默认显示 -->
-   <div class="chat-empty" v-if="chatMessages.length === 0">
+   <div class="chat-empty" v-if="messages.length === 0">
     <van-empty description="开始与ai助手对话" />
     <div class="quick-question">
       <div class="quick-title">常见问题</div>
@@ -26,13 +26,14 @@
    </div>
    <!-- 有对话内容时显示 -->
     <div class="message-list" v-else>
-      <ChatBubble v-for="message in chatMessages" :key="message.id" :message="message" />
+      <ChatBubble v-for="message in messages" :key="message.id" :message="message" />
       <div v-if="isStreaming" class="streaming-indicator">
          <van-Loading type="spinner" size="20px" />
            <span>AI正在思考中...</span>
       </div>
     </div>
  </div>
+    <!-- 对话输入区域 -->
   <div class="chat-input-area">
     <div class="input-wrapper">
      <van-field
@@ -68,8 +69,7 @@ const scrollToBottom = () => {
   chatContainer.value.scrollTop = chatContainer.value.scrollHeight
 }
 
-// 对话消息
-const chatMessages = ref([])
+
 
 // 常见问题
 const commonQuestions = ref([
@@ -84,11 +84,12 @@ const commonQuestions = ref([
 const router = useRouter()
 //用户输入框内容
 const inputMessage = ref('')
+
 //是否正在流式传输
 const isStreaming = ref(false)
-// 对话消息
+// 固定格式处理后对话消息，包含user和ai对象传入组件显示
 const messages = ref([])
-// 整体字符串消息
+// 流式传输的整体字符串消息
 const fullResponse = ref('')
 
 
@@ -99,11 +100,13 @@ const onBack = () => {
 }
 //发送消息
 const sendMessage = () => {
+  // 处理用户输入去空格
  const msg = inputMessage.value.trim()
 if (!msg || isStreaming.value) {
 return}
  //添加用户消息
  addUserMessage(msg)
+  //输入框内容存档
 const  userMsg=inputMessage.value
  //清空输入框内容
  inputMessage.value = ''
@@ -113,6 +116,7 @@ const  userMsg=inputMessage.value
 }
 //添加用户消息
 const addUserMessage = (msg) => {
+  // 固定格式user对象数据增加
 messages.value.push ({
 id: Date.now() + 1,
 role: 'user',
@@ -121,8 +125,10 @@ timestamp: new Date().toISOString()
 })}
 //获取流式响应
 const fechAiResponse = (userMsg) => {
+  console.log(`要获取流式响应了${userMsg}`)
   isStreaming.value = true
   //添加ai返回的消息
+  // 固定格式ai对象数据增加
         messages.value.push({
            id: Date.now() + 2,
            role: 'ai',
@@ -134,12 +140,14 @@ const fechAiResponse = (userMsg) => {
   {
     message: userMsg,
   },
+   //分片处理函数
   (chunk)=>{
       fullResponse.value += chunk
       //AI正在回复的消息
          const lastMsg = messages.value[messages.value.length - 1]
        if (lastMsg && lastMsg.role === 'ai') {
           lastMsg.content = fullResponse}
+         
           scrollToBottom()
   },
   ()=>{
