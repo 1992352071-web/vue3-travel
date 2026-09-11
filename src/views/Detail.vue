@@ -116,7 +116,7 @@ async function loadRecommendation() {
       city: formData.city,
       days: formData.days,
       budget:{item: "总计",
-        amount: 50000},
+        amount: formData.budget},
       budgetBreakdown :[
   {
     item: "住宿",
